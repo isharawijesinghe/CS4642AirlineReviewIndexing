@@ -9,7 +9,7 @@ import scrapy
 
 
 class Cs4642AirlinereviewindexingItem(scrapy.Item):
-
+    airline_category = scrapy.Field()
     name = scrapy.Field()
     review_from = scrapy.Field()
     review_date = scrapy.Field()

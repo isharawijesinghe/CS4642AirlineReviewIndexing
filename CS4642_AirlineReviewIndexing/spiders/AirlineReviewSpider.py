@@ -1,16 +1,20 @@
 import scrapy
 import cssutils
 
-class EmiratesAirlineReviewSpider(scrapy.Spider):
-    name = "EmiratesAirlineReviewSpider"
+class AirlineReviewSpider(scrapy.Spider):
+    name = "AirlineReviewSpider"
     allowed_domains = ["airlineratings.come"]
-    start_urls = ["https://www.airlineratings.com/passenger-reviews/emirates/"]
+    start_urls = ["https://www.airlineratings.com/passenger-reviews/american-airlines/","https://www.airlineratings.com/passenger-reviews/emirates/"
+                  ,"https://www.airlineratings.com/passenger-reviews/qantas/","https://www.airlineratings.com/passenger-reviews/srilankan-airlines/",
+                  "https://www.airlineratings.com/passenger-reviews/united-airlines/","https://www.airlineratings.com/passenger-reviews/vietjet-air/"]
 
 
     def parse(self,response):
 
+        airline_category =  response.xpath("//h1/text()").extract()[0]
         for titles in response.xpath("//div[@class='td-post-content']/div[@class='passenger_review']"):
             item ={
+                'airline_category': airline_category,
                 'name': titles.select("div[@class='passenger_review_header']/h3/text()").extract()[0],
                 'review_from': titles.select("div[@class='passenger_review_header']/p/text()").extract()[0],
                 'review_date': titles.select("div[@class='passenger_review_header']/p/span[@class='review_date']/text()").extract()[0],
@@ -31,7 +35,6 @@ class EmiratesAirlineReviewSpider(scrapy.Spider):
         next_page_url = response.xpath("//div[@class='alignright']/a/@href").extract_first()
         if next_page_url:
             next_page_url = response.urljoin(next_page_url)
-            print(next_page_url)
             yield scrapy.Request(url=next_page_url,callback=self.parse,dont_filter=True)
 
 
